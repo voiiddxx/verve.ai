@@ -42,7 +42,6 @@ const checkError = async (code: string) => {
         console.log("Generated text:", text);
         return text;
     } catch (error) {   
-        console.error
     }
 }
 
