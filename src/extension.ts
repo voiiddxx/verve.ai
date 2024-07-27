@@ -60,8 +60,9 @@ export function activate(context: vscode.ExtensionContext) {
                         const explainResponse = await fixCodeService(selectionText);
                         if (explainResponse) {
                             const finalResult = commentResponse(explainResponse , langId);
+                            const cleanedResponse = cleanResponse(explainResponse)
                             await editor.edit(editBuilder => {
-                                editBuilder.replace(selection, finalResult);
+                                editBuilder.replace(selection, cleanedResponse );
                             });
                             vscode.window.showInformationMessage("Solution applied successfully!");
                         } else {
@@ -177,6 +178,14 @@ function commentResponse(response: string, languageId: string): string {
         default:
             return `/* ${response} */`;
     }
+}
+
+
+
+
+function cleanResponse(response: string): string {
+    // Remove Markdown code block formatting
+    return response.replace(/```[a-z]*\n/g, '').replace(/```/g, '');
 }
 
 
