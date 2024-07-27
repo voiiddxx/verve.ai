@@ -12,9 +12,37 @@ export function activate(context: vscode.ExtensionContext) {
     // explain code
     let explainCodeCommand = vscode.commands.registerCommand('verve-ai.helloWorld', async () => {
         // for checking that command is working or not
-        vscode.window.showInformationMessage("Hello World! This is code explain command!");
+        const editor = vscode.window.activeTextEditor;
+        if (editor) {
+            const selection = editor.selection;
+            if (selection) {
+                const selectionText = editor.document.getText(selection);
+                if (selectionText) {
+                    try {
+                        const explainResponse = await explainCodeService(selectionText);
+                        if(explainResponse){
+                            await editor.edit(editBuilder =>{
+                                editBuilder.insert(selection.end, `\n\n/*  */\n/* Solution: ${explainResponse} */\n`);
+                            });
+                        }else{
+                            vscode.window.showInformationMessage("Error " + "Some issue encountered , please try again" );
+                        }
+                    } catch (e) {
+                        console.error("failed to explain code: ", e);
+                    }
+                } else {
+                    console.log("Some issue occured!");
+
+                }
+            } else {
+                vscode.window.showInformationMessage("Please select a code to continue...");
+
+            }
+        } else {
+            console.log("No Editor Found!");
+        }
     });
-    
+
     // fix code // or add solution
     let applySolutionCommand = vscode.commands.registerCommand('verve-ai.applySolution', async () => {
         vscode.window.showInformationMessage("Hello World! This is apply solution command!");
@@ -44,6 +72,19 @@ const checkError = async (code: string) => {
 };
 
 
+const explainCodeService =  async (code : string)=>{
+    const prompt = "Please explain every section of this code: " + code + "make sure to explain the code in such way so it become so convenient to understand the code.";
+    try {
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            const text = await response.text();
+            return text;
+    } catch (error) {
+        console.log("Error: ",error);
+    }
+}
+
+
 // vscode.window.showInformationMessage('Hello From the verve.ai server');
 //         const editor = vscode.window.activeTextEditor;
 
@@ -63,4 +104,3 @@ const checkError = async (code: string) => {
 //                 }
 //             } catch (error) {
 //                 vscode.window.showErrorMessage(`Failed to process the code: `);
-         
