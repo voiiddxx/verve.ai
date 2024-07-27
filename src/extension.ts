@@ -14,18 +14,20 @@ export function activate(context: vscode.ExtensionContext) {
         // for checking that command is working or not
         const editor = vscode.window.activeTextEditor;
         if (editor) {
+            const langId = editor.document.languageId;
             const selection = editor.selection;
             if (selection) {
                 const selectionText = editor.document.getText(selection);
                 if (selectionText) {
                     try {
                         const explainResponse = await explainCodeService(selectionText);
-                        if(explainResponse){
-                            await editor.edit(editBuilder =>{
-                                editBuilder.insert(selection.end, `\n\n/*  */\n/* Solution: ${explainResponse} */\n`);
+                        if (explainResponse) {
+                            const finalResult =  commentResponse(explainResponse , langId);
+                            await editor.edit(editBuilder => {
+                                editBuilder.insert(selection.end, `${finalResult}`);
                             });
-                        }else{
-                            vscode.window.showInformationMessage("Error " + "Some issue encountered , please try again" );
+                        } else {
+                            vscode.window.showInformationMessage("Error " + "Some issue encountered , please try again");
                         }
                     } catch (e) {
                         console.error("failed to explain code: ", e);
@@ -46,54 +48,61 @@ export function activate(context: vscode.ExtensionContext) {
     // fix code // or add solution
     let applySolutionCommand = vscode.commands.registerCommand('verve-ai.applySolution', async () => {
         vscode.window.showInformationMessage("Hello World! This is apply solution command!");
+    
         const editor = vscode.window.activeTextEditor;
         if (editor) {
+            const langId = editor.document.languageId;
             const selection = editor.selection;
             if (selection) {
                 const selectionText = editor.document.getText(selection);
                 if (selectionText) {
                     try {
                         const explainResponse = await fixCodeService(selectionText);
-                        if(explainResponse){
-                            await editor.edit(editBuilder =>{
-                                editBuilder.insert(selection.end, `\n\n/*  */\n/* Solution: ${explainResponse} */\n`);
+                        if (explainResponse) {
+                            const finalResult = commentResponse(explainResponse , langId);
+                            await editor.edit(editBuilder => {
+                                editBuilder.replace(selection, finalResult);
                             });
-                        }else{
-                            vscode.window.showInformationMessage("Error " + "Some issue encountered , please try again" );
+                            vscode.window.showInformationMessage("Solution applied successfully!");
+                        } else {
+                            vscode.window.showInformationMessage("Error: Some issue encountered, please try again");
                         }
                     } catch (e) {
-                        console.error("failed to explain code: ", e);
+                        console.error("Failed to apply solution: ", e);
+                        vscode.window.showInformationMessage("Error: Failed to apply solution, please check the console for details.");
                     }
                 } else {
-                    console.log("Some issue occured!");
-
+                    vscode.window.showInformationMessage("Please select some text to apply the solution.");
                 }
             } else {
-                vscode.window.showInformationMessage("Please select a code to continue...");
-
+                vscode.window.showInformationMessage("Please select some text to continue.");
             }
         } else {
-            console.log("No Editor Found!");
+            console.log("No active editor found!");
+            vscode.window.showInformationMessage("No active editor found.");
         }
     });
+    
 
     // find error
     let findErrorCommand = vscode.commands.registerCommand('verve-ai.findError', async () => {
         vscode.window.showInformationMessage("Hello World! This is find error command!");
         const editor = vscode.window.activeTextEditor;
         if (editor) {
+            const langId = editor.document.languageId;
             const selection = editor.selection;
             if (selection) {
                 const selectionText = editor.document.getText(selection);
                 if (selectionText) {
                     try {
                         const explainResponse = await findErrorService(selectionText);
-                        if(explainResponse){
-                            await editor.edit(editBuilder =>{
-                                editBuilder.insert(selection.end, `\n\n/*  */\n/* Solution: ${explainResponse} */\n`);
+                        if (explainResponse) {
+                            const finalResult = commentResponse(explainResponse, langId,);
+                            await editor.edit(editBuilder => {
+                                editBuilder.insert(selection.end, finalResult);
                             });
-                        }else{
-                            vscode.window.showInformationMessage("Error " + "Some issue encountered , please try again" );
+                        } else {
+                            vscode.window.showInformationMessage("Error " + "Some issue encountered , please try again");
                         }
                     } catch (e) {
                         console.error("failed to explain code: ", e);
@@ -116,47 +125,34 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(findErrorCommand);
 }
 
-const checkError = async (code: string) => {
-    const prompt = `Please explain this code: ${code}`;
-    try {
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = await response.text();
-        console.log("Generated text:", text);
-        return text;
-    } catch (error) {
-        console.error("Error generating content:", error);
-    }
-};
 
-
-const explainCodeService =  async (code : string)=>{
+const explainCodeService = async (code: string) => {
     const prompt = "Please explain every section of this code: " + code + "make sure to explain the code in such way so it become so convenient to understand the code.";
     try {
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
-            const text = await response.text();
-            return text;
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = await response.text();
+        return text;
     } catch (error) {
-        console.log("Error: ",error);
+        console.log("Error: ", error);
     }
 }
 
 
-const fixCodeService = async  (code : string)=>{
+const fixCodeService = async (code: string) => {
     const prompt = `${code} 
-    There is some error in this code , please identify all the issues in this code and please fix this code , make sure do not genreate any other output , make sure to genreate only the fix code!`
+    There is some error in this code , please identify all the issues in this code and please fix this code , make sure do not genreate any other output , make sure to genreate only the fix code! , just don't add anything extra return the fixed code only , dont add any language name or comments`
     try {
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const text = await response.text();
         return text;
-} catch (error) {
-    console.log("Error: ",error);
-}
+    } catch (error) {
+        console.log("Error: ", error);
+    }
 }
 
-const findErrorService = async  (code : string)=>{
+const findErrorService = async (code: string) => {
     const prompt = `${code} 
     There is some error in this code , please identify all the issues in this code and tell me that why this cod is not working properly`
     try {
@@ -164,9 +160,24 @@ const findErrorService = async  (code : string)=>{
         const response = await result.response;
         const text = await response.text();
         return text;
-} catch (error) {
-    console.log("Error: ",error);
+    } catch (error) {
+        console.log("Error: ", error);
+    }
 }
+
+function commentResponse(response: string, languageId: string): string {
+    switch (languageId) {
+        case 'javascript':
+        case 'typescript':
+            return `/* ${response} */`;
+        case 'python':
+            return `# ${response}`;
+        case 'html':
+            return `<!-- ${response} -->`;
+        default:
+            return `/* ${response} */`;
+    }
 }
+
 
 
