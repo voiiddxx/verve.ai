@@ -46,11 +46,69 @@ export function activate(context: vscode.ExtensionContext) {
     // fix code // or add solution
     let applySolutionCommand = vscode.commands.registerCommand('verve-ai.applySolution', async () => {
         vscode.window.showInformationMessage("Hello World! This is apply solution command!");
+        const editor = vscode.window.activeTextEditor;
+        if (editor) {
+            const selection = editor.selection;
+            if (selection) {
+                const selectionText = editor.document.getText(selection);
+                if (selectionText) {
+                    try {
+                        const explainResponse = await fixCodeService(selectionText);
+                        if(explainResponse){
+                            await editor.edit(editBuilder =>{
+                                editBuilder.insert(selection.end, `\n\n/*  */\n/* Solution: ${explainResponse} */\n`);
+                            });
+                        }else{
+                            vscode.window.showInformationMessage("Error " + "Some issue encountered , please try again" );
+                        }
+                    } catch (e) {
+                        console.error("failed to explain code: ", e);
+                    }
+                } else {
+                    console.log("Some issue occured!");
+
+                }
+            } else {
+                vscode.window.showInformationMessage("Please select a code to continue...");
+
+            }
+        } else {
+            console.log("No Editor Found!");
+        }
     });
 
     // find error
     let findErrorCommand = vscode.commands.registerCommand('verve-ai.findError', async () => {
         vscode.window.showInformationMessage("Hello World! This is find error command!");
+        const editor = vscode.window.activeTextEditor;
+        if (editor) {
+            const selection = editor.selection;
+            if (selection) {
+                const selectionText = editor.document.getText(selection);
+                if (selectionText) {
+                    try {
+                        const explainResponse = await findErrorService(selectionText);
+                        if(explainResponse){
+                            await editor.edit(editBuilder =>{
+                                editBuilder.insert(selection.end, `\n\n/*  */\n/* Solution: ${explainResponse} */\n`);
+                            });
+                        }else{
+                            vscode.window.showInformationMessage("Error " + "Some issue encountered , please try again" );
+                        }
+                    } catch (e) {
+                        console.error("failed to explain code: ", e);
+                    }
+                } else {
+                    console.log("Some issue occured!");
+
+                }
+            } else {
+                vscode.window.showInformationMessage("Please select a code to continue...");
+
+            }
+        } else {
+            console.log("No Editor Found!");
+        }
     });
 
     context.subscriptions.push(explainCodeCommand);
@@ -85,22 +143,30 @@ const explainCodeService =  async (code : string)=>{
 }
 
 
-// vscode.window.showInformationMessage('Hello From the verve.ai server');
-//         const editor = vscode.window.activeTextEditor;
+const fixCodeService = async  (code : string)=>{
+    const prompt = `${code} 
+    There is some error in this code , please identify all the issues in this code and please fix this code , make sure do not genreate any other output , make sure to genreate only the fix code!`
+    try {
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = await response.text();
+        return text;
+} catch (error) {
+    console.log("Error: ",error);
+}
+}
 
-//         if (editor) {
-//             const selection = editor.selection;
-//             const selectedText = editor.document.getText(selection);
-//             console.log("Selected text:", selectedText);
+const findErrorService = async  (code : string)=>{
+    const prompt = `${code} 
+    There is some error in this code , please identify all the issues in this code and tell me that why this cod is not working properly`
+    try {
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = await response.text();
+        return text;
+} catch (error) {
+    console.log("Error: ",error);
+}
+}
 
-//             try {
-//                 const data = await checkError(selectedText);
-//                 if (data) {
-//                     solvedCode = data;
-//                     await editor.edit(editorBuilder => {
-//                         editorBuilder.insert(selection.end, `\n\n/* Error: "error" */\n/* Solution: ${data} */\n`);
-//                     });
-//                     vscode.window.showInformationMessage("Error details inserted. Press Tab to apply the solution...");
-//                 }
-//             } catch (error) {
-//                 vscode.window.showErrorMessage(`Failed to process the code: `);
+
