@@ -9,7 +9,6 @@ let solvedCode: string | null = null;
 
 export function activate(context: vscode.ExtensionContext) {
 
-
     // explain code
     let explainCodeCommand = vscode.commands.registerCommand('verve-ai.helloWorld', async () => {
         // for checking that command is working or not
@@ -18,15 +17,13 @@ export function activate(context: vscode.ExtensionContext) {
     
     // fix code // or add solution
     let applySolutionCommand = vscode.commands.registerCommand('verve-ai.applySolution', async () => {
-
-
-    vscode.window.showInformationMessage("hello world! This is code explain command!");
+        vscode.window.showInformationMessage("Hello World! This is apply solution command!");
     });
 
     // find error
-    let findErrorCommand = vscode.commands.registerCommand('verev-ai.findError', async () => {
-        vscode.window.showInformationMessage("hello world! This is code explain command!");
-    })
+    let findErrorCommand = vscode.commands.registerCommand('verve-ai.findError', async () => {
+        vscode.window.showInformationMessage("Hello World! This is find error command!");
+    });
 
     context.subscriptions.push(explainCodeCommand);
     context.subscriptions.push(applySolutionCommand);
@@ -41,10 +38,10 @@ const checkError = async (code: string) => {
         const text = await response.text();
         console.log("Generated text:", text);
         return text;
-    } catch (error) {   
+    } catch (error) {
+        console.error("Error generating content:", error);
     }
-}
-
+};
 
 
 // vscode.window.showInformationMessage('Hello From the verve.ai server');

@@ -11,7 +11,8 @@
   ],
   "activationEvents": [
     "onCommand:verve-ai.helloWorld",
-    "onCommand:verve-ai.applySolution"
+    "onCommand:verve-ai.applySolution",
+    "onCommand:verve-ai.findError"
   ],
   "main": "./out/extension.js",
   "contributes": {
