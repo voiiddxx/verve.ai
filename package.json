@@ -1,0 +1,81 @@
+{
+  "name": "verve-ai",
+  "displayName": "verve.ai",
+  "description": "A VS Code extension to assist with code error handling using Google Generative AI",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.91.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:verve-ai.helloWorld",
+    "onCommand:verve-ai.applySolution"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "verve-ai.helloWorld",
+        "title": "Explain This Code"
+      },
+      {
+        "command": "verve-ai.applySolution",
+        "title": "Fix Issues"
+      },
+      {
+        "command": "verve-ai.findError",
+        "title": "Find Error"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "verve-ai.helloWorld",
+          "when": "editorHasSelection",
+          "group": "navigation"
+        },
+        {
+          "command": "verve-ai.applySolution",
+          "when": "editorHasSelection",
+          "group": "navigation"
+        },
+        {
+          "command": "verve-ai.findError",
+          "when": "editorHasSelection",
+          "group": "navigation"
+        }
+      ]
+    }
+  },
+  "keybindings": [
+    {
+      "command": "verve-ai.applySolution",
+      "key": "ctrl+d",
+      "when": "editorHasSelection"
+    }
+  ],
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.7",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.91.0",
+    "@typescript-eslint/eslint-plugin": "^7.14.1",
+    "@typescript-eslint/parser": "^7.11.0",
+    "@vscode/test-cli": "^0.0.9",
+    "@vscode/test-electron": "^2.4.0",
+    "eslint": "^8.57.0",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.16.0"
+  }
+}
