@@ -47,7 +47,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     // fix code // or add solution
     let applySolutionCommand = vscode.commands.registerCommand('verve-ai.applySolution', async () => {
-        vscode.window.showInformationMessage("Hello World! This is apply solution command!");
+        vscode.window.showInformationMessage("verve.ai is working on your requirement , please wait!");
     
         const editor = vscode.window.activeTextEditor;
         if (editor) {
@@ -87,7 +87,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     // find error
     let findErrorCommand = vscode.commands.registerCommand('verve-ai.findError', async () => {
-        vscode.window.showInformationMessage("Hello World! This is find error command!");
+        vscode.window.showInformationMessage("verve.ai is working on your requirement , please wait!");
         const editor = vscode.window.activeTextEditor;
         if (editor) {
             const langId = editor.document.languageId;
@@ -125,7 +125,7 @@ export function activate(context: vscode.ExtensionContext) {
 
         // Genreate Code
         let genreateCommand = vscode.commands.registerCommand('verve-ai.genreateCode', async () => {
-            vscode.window.showInformationMessage("Hello World! This is apply solution command!");
+            vscode.window.showInformationMessage("verve.ai is working on your requirement , please wait!");
         
             const editor = vscode.window.activeTextEditor;
             if (editor) {
@@ -164,7 +164,7 @@ export function activate(context: vscode.ExtensionContext) {
 
         // Genreate Code
         let fixGrammerCommand = vscode.commands.registerCommand('verve-ai.fixGrammer', async () => {
-            vscode.window.showInformationMessage("Hello World! This is apply solution command!");
+            vscode.window.showInformationMessage("verve.ai is working on your requirement , please wait!");
         
             const editor = vscode.window.activeTextEditor;
             if (editor) {
@@ -176,7 +176,6 @@ export function activate(context: vscode.ExtensionContext) {
                         try {
                             const explainResponse = await checkGrammerService(selectionText);
                             if (explainResponse) {
-                                const finalResult = commentResponse(explainResponse , langId);
                                 const cleanedResponse = cleanResponse(explainResponse)
                                 await editor.edit(editBuilder => {
                                     editBuilder.replace(selection, cleanedResponse );
@@ -249,7 +248,7 @@ const findErrorService = async (code: string) => {
 }
 
 const genreateCodeService = async  (code : string )=>{
-    const prompt = `${code}`
+    const prompt = `${code} , make sure you should not give anything extra in output , you must give only genreated code dont add anything extra, `
     try {
         const result = await model.generateContent(prompt);
         const response = await result.response;

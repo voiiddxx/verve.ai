@@ -1,6 +1,7 @@
 {
   "name": "verve-ai",
   "displayName": "verve.ai",
+  "publisher": "voidtsx",
   "description": "A VS Code extension to assist with code error handling using Google Generative AI",
   "version": "0.0.1",
   "engines": {
@@ -97,6 +98,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.16.0"
+    "@google/generative-ai": "^0.16.0",
+    "vsce": "^2.15.0"
   }
 }
