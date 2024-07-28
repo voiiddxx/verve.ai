@@ -12,7 +12,8 @@
   "activationEvents": [
     "onCommand:verve-ai.helloWorld",
     "onCommand:verve-ai.applySolution",
-    "onCommand:verve-ai.findError"
+    "onCommand:verve-ai.findError",
+    "onCommand:verve-ai.genreateCode"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -28,6 +29,10 @@
       {
         "command": "verve-ai.findError",
         "title": "Find Error"
+      },
+      {
+        "command": "verve-ai.genreateCode",
+        "title": "Genreate Code"
       }
     ],
     "menus": {
@@ -44,6 +49,11 @@
         },
         {
           "command": "verve-ai.findError",
+          "when": "editorHasSelection",
+          "group": "navigation"
+        },
+        {
+          "command": "verve-ai.genreateCode",
           "when": "editorHasSelection",
           "group": "navigation"
         }
