@@ -162,10 +162,50 @@ export function activate(context: vscode.ExtensionContext) {
             }
         });
 
+        // Genreate Code
+        let fixGrammerCommand = vscode.commands.registerCommand('verve-ai.fixGrammer', async () => {
+            vscode.window.showInformationMessage("Hello World! This is apply solution command!");
+        
+            const editor = vscode.window.activeTextEditor;
+            if (editor) {
+                const langId = editor.document.languageId;
+                const selection = editor.selection;
+                if (selection) {
+                    const selectionText = editor.document.getText(selection);
+                    if (selectionText) {
+                        try {
+                            const explainResponse = await checkGrammerService(selectionText);
+                            if (explainResponse) {
+                                const finalResult = commentResponse(explainResponse , langId);
+                                const cleanedResponse = cleanResponse(explainResponse)
+                                await editor.edit(editBuilder => {
+                                    editBuilder.replace(selection, cleanedResponse );
+                                });
+                                vscode.window.showInformationMessage("Solution applied successfully!");
+                            } else {
+                                vscode.window.showInformationMessage("Error: Some issue encountered, please try again");
+                            }
+                        } catch (e) {
+                            console.error("Failed to apply solution: ", e);
+                            vscode.window.showInformationMessage("Error: Failed to apply solution, please check the console for details.");
+                        }
+                    } else {
+                        vscode.window.showInformationMessage("Please select some text to apply the solution.");
+                    }
+                } else {
+                    vscode.window.showInformationMessage("Please select some text to continue.");
+                }
+            } else {
+                console.log("No active editor found!");
+                vscode.window.showInformationMessage("No active editor found.");
+            }
+        });
+
     context.subscriptions.push(explainCodeCommand);
     context.subscriptions.push(applySolutionCommand);
     context.subscriptions.push(findErrorCommand);
     context.subscriptions.push(genreateCommand);
+    context.subscriptions.push(fixGrammerCommand);
 }
 
 
@@ -220,6 +260,19 @@ const genreateCodeService = async  (code : string )=>{
     }
 }
 
+
+const checkGrammerService =  async(code : string)=>{
+    const prompt = `${code} 
+    Please fix all the gramatical errors and all the spelling errors`
+    try {
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = await response.text();
+        return text;
+    } catch (error) {
+        console.log("Error: ", error);
+    }
+}
 
 function commentResponse(response: string, languageId: string): string {
     switch (languageId) {

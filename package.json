@@ -13,7 +13,8 @@
     "onCommand:verve-ai.helloWorld",
     "onCommand:verve-ai.applySolution",
     "onCommand:verve-ai.findError",
-    "onCommand:verve-ai.genreateCode"
+    "onCommand:verve-ai.genreateCode",
+    "onCommand:verve-ai.fixGrammer"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -33,6 +34,10 @@
       {
         "command": "verve-ai.genreateCode",
         "title": "Genreate Code"
+      },
+      {
+        "command": "verve-ai.fixGrammer",
+        "title": "Fix Grammer"
       }
     ],
     "menus": {
@@ -54,6 +59,11 @@
         },
         {
           "command": "verve-ai.genreateCode",
+          "when": "editorHasSelection",
+          "group": "navigation"
+        },
+        {
+          "command": "verve-ai.fixGrammer",
           "when": "editorHasSelection",
           "group": "navigation"
         }
