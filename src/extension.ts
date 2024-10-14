@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const API_KEY = 'AIzaSyBb4QZ3jFwBVadrnHnQuOyeczaoBNVKrXI';
+const API_KEY = 'YOUR_GEMINI_API_KEY';
 const genAI = new GoogleGenerativeAI(API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
